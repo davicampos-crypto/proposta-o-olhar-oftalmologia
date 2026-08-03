@@ -1,0 +1,36 @@
+# Site estático — nada para compilar no Netlify.
+# O build.py roda localmente; o que sobe já é HTML pronto.
+
+[build]
+  publish = "."
+
+# ── URLs limpas ──
+# O Netlify já serve /exames como exames.html. Isto garante que a versão
+# com .html redirecione para a limpa, evitando conteúdo duplicado no Google.
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+# ── Segurança ──
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+
+# ── Cache ──
+# CSS e JS mudam junto com o site e não têm hash no nome: cache curto,
+# senão o visitante fica preso numa versão antiga depois de um deploy.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
